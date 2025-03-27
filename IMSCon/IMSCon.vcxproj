@@ -157,7 +157,7 @@ copy /Y "$(ProjectDir)SDL_mixer-1.2.12\lib\$(PlatformShortName)\SDL_mixer.dll" "
   <ItemGroup>
     <ClCompile Include="adlib.c" />
     <ClCompile Include="bnk.c" />
-    <ClCompile Include="convert.c" />
+    <ClCompile Include="han.c" />
     <ClCompile Include="fmopl.c" />
     <ClCompile Include="ims.c" />
     <ClCompile Include="main.c" />
@@ -169,7 +169,7 @@ copy /Y "$(ProjectDir)SDL_mixer-1.2.12\lib\$(PlatformShortName)\SDL_mixer.dll" "
   <ItemGroup>
     <ClInclude Include="adlib.h" />
     <ClInclude Include="bnk.h" />
-    <ClInclude Include="convert.h" />
+    <ClInclude Include="han.h" />
     <ClInclude Include="fmopl.h" />
     <ClInclude Include="ims.h" />
     <ClInclude Include="music.h" />

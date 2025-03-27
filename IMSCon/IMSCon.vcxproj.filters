@@ -21,7 +21,7 @@
     <ClCompile Include="adlib.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="convert.c">
+    <ClCompile Include="han.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="fmopl.c">
@@ -50,7 +50,7 @@
     <ClInclude Include="adlib.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="convert.h">
+    <ClInclude Include="han.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="fmopl.h">
