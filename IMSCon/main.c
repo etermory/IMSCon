@@ -7,6 +7,7 @@
 #include <SDL_mixer.h>
 
 #include "music.h"
+#include "han.h"
 
 
 typedef struct {
@@ -60,6 +61,10 @@ void play(SRC_PAIR playlist[], int list_cnt, SDL_AUDIO_USERDATA* userdata)
     for (int i = 0; i < list_cnt; ++i) {
         IMS_MUSIC* music = prepare_music(playlist[i].ims_path, playlist[i].bnk_path);
         if (music != NULL) {
+            char title[30] = { 0, };
+            han_conv(0, music->ims->header->tune_name, title);
+            printf("%s\n", title);
+
             ((SDL_AUDIO_USERDATA*)userdata)->music = music;
 
             SDL_PauseAudio(0);
