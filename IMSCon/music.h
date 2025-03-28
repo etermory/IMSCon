@@ -2,9 +2,14 @@
 
 #include <stdbool.h>
 
-#include "ims.h"
 #include "bnk.h"
+#include "ims.h"
+#include "iss.h"
 
+
+typedef struct {
+    char text[64];
+} LYRIC;
 
 typedef struct {
     int ksl;                // Key scaling level
@@ -35,9 +40,13 @@ typedef struct {
 
 typedef struct {
     IMS* ims;
+    ISS* iss;
+    LYRIC* lyrics;
     BNK* bnk;
     TIMBRE* timbres;
     bool is_end;
+    int tick;
+    int last_iss_rec_pos;
     int tempo;
     int pos;
     int sample_remain_len;
@@ -49,6 +58,6 @@ typedef int (*muldiv_func)(int number, int numerator, int denominator);
 
 void ims_init();
 void ims_shutdown();
-IMS_MUSIC* prepare_music(char* ims_path, char* bnk_path);
+IMS_MUSIC* prepare_music(char* ims_path, char* iss_path, char* bnk_path);
 void free_music(IMS_MUSIC* music);
 int get_sample(IMS_MUSIC* music, uint16_t* pcm_buffer, int buffer_len, muldiv_func muldiv);

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "han.h"
 #include "music.h"
 
 #include "adlib.h"
@@ -102,6 +103,19 @@ int _proc_music(IMS_MUSIC* music)
     return delay;
 }
 
+void _proc_lyrics(IMS_MUSIC* music)
+{
+    if (music->iss != NULL) {
+        int time_end = music->tick / 8;
+        for (int i = music->last_iss_rec_pos + 1; i < music->iss->header->rec_count; ++i) {
+            if (time_end <= music->iss->records[i].time) {
+                music->last_iss_rec_pos = i - 1;
+                break;
+            }
+        }
+    }
+}
+
 int get_sample(IMS_MUSIC* music, uint16_t* pcm_buffer, int buffer_len, muldiv_func muldiv)
 {
     int sample_len = 0;
@@ -115,6 +129,9 @@ int get_sample(IMS_MUSIC* music, uint16_t* pcm_buffer, int buffer_len, muldiv_fu
             int tempo = music->tempo;
             int delay = _proc_music(music);
             sample_len = muldiv(_freq * 60, delay, tempo * music->ims->header->tick_beat);
+            music->tick += delay;
+
+            _proc_lyrics(music);
         }
 
         if (sample_len == 0) {
@@ -172,22 +189,57 @@ TIMBRE* _create_timbre_params(IMS* ims, BNK* bnk)
     return timbres;
 }
 
-IMS_MUSIC* _load_music(char* ims_path, char* bnk_path)
+LYRIC* _convert_lyrics(ISS* iss)
+{
+    LYRIC* lyrics = malloc(sizeof(LYRIC) * iss->header->lyrics_count);
+    if (lyrics == NULL) {
+        return NULL;
+    }
+
+    for (int i = 0; i < iss->header->lyrics_count; ++i) {
+        han_conv(0, iss->lyrics[i].text, lyrics[i].text);
+    }
+
+    return lyrics;
+}
+
+IMS_MUSIC* _load_music(char* ims_path, char* iss_path, char* bnk_path)
 {
     IMS* ims = load_ims(ims_path);
     if (ims == NULL) {
         return NULL;
     }
 
+    ISS* iss = NULL;
+    LYRIC* lyrics = NULL;
+    if (iss_path != NULL) {
+        iss = load_iss(iss_path);
+        if (iss != NULL) {
+            lyrics = _convert_lyrics(iss);
+        }
+    }
+
     BNK* bnk = load_bnk(bnk_path);
     if (bnk == NULL) {
         free_ims(ims);
+        if (iss != NULL) {
+            free_iss(iss);
+            if (lyrics != NULL) {
+                free(lyrics);
+            }
+        }
         return NULL;
     }
 
     TIMBRE* timbres = _create_timbre_params(ims, bnk);
     if (timbres == NULL) {
         free_ims(ims);
+        if (iss != NULL) {
+            free_iss(iss);
+            if (lyrics != NULL) {
+                free(lyrics);
+            }
+        }
         free_bnk(bnk);
         return NULL;
     }
@@ -195,6 +247,12 @@ IMS_MUSIC* _load_music(char* ims_path, char* bnk_path)
     IMS_MUSIC* music = malloc(sizeof(IMS_MUSIC));
     if (music == NULL) {
         free_ims(ims);
+        if (iss != NULL) {
+            free_iss(iss);
+            if (lyrics != NULL) {
+                free(lyrics);
+            }
+        }
         free_bnk(bnk);
         free(timbres);
         return NULL;
@@ -202,6 +260,8 @@ IMS_MUSIC* _load_music(char* ims_path, char* bnk_path)
 
     memset(music, 0, sizeof(IMS_MUSIC));
     music->ims = ims;
+    music->iss = iss;
+    music->lyrics = lyrics;
     music->bnk = bnk;
     music->timbres = timbres;
     music->tempo = ims->header->basic_tempo;
@@ -212,14 +272,20 @@ IMS_MUSIC* _load_music(char* ims_path, char* bnk_path)
 void free_music(IMS_MUSIC* music)
 {
     free_ims(music->ims);
+    if (music->iss != NULL) {
+        free_iss(music->iss);
+        if (music->lyrics != NULL) {
+            free(music->lyrics);
+        }
+    }
     free_bnk(music->bnk);
     free(music->timbres);
     free(music);
 }
 
-IMS_MUSIC* prepare_music(char* ims_path, char* bnk_path)
+IMS_MUSIC* prepare_music(char* ims_path, char* iss_path, char* bnk_path)
 {
-    IMS_MUSIC* music = _load_music(ims_path, bnk_path);
+    IMS_MUSIC* music = _load_music(ims_path, iss_path, bnk_path);
     if (music == NULL) {
         return NULL;
     }
