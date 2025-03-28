@@ -48,6 +48,9 @@
     <ClCompile Include="iss.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="play.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adlib.h">
@@ -78,6 +81,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="iss.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="play.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
