@@ -171,7 +171,7 @@ copy /Y "$(ProjectDir)SDL_mixer-1.2.12\lib\$(PlatformShortName)\SDL_mixer.dll" "
   <ItemGroup>
     <ClInclude Include="adlib.h" />
     <ClInclude Include="bnk.h" />
-    <ClInclude Include="FFT.hpp" />
+    <ClInclude Include="fft.h" />
     <ClInclude Include="han.h" />
     <ClInclude Include="fmopl.h" />
     <ClInclude Include="ims.h" />

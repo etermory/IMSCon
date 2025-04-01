@@ -86,7 +86,7 @@
     <ClInclude Include="play.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="FFT.hpp">
+    <ClInclude Include="fft.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

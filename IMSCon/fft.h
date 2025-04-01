@@ -28,11 +28,13 @@
 #ifndef FFT_HPP
 #define FFT_HPP
 
-#include <exception>
+//#include <exception>
+#include <stdbool.h>
+#include <stdint.h>
 #include <math.h>
 
 // Ernzo::DSP
-namespace Ernzo { namespace DSP {
+//namespace Ernzo { namespace DSP {
 
 static const double DDC_PI = 3.14159265358979323846;
 
@@ -40,9 +42,9 @@ static const double DDC_PI = 3.14159265358979323846;
  * FFT class - static implementation only
  * based on 1998 original version by: Don Cross <dcross@intersrv.com>
  */
-class FFT
-{
-public:
+//class FFT
+//{
+//public:
     /**
      * Verifies a number is a power of two
      * @param x Number to check
@@ -122,16 +124,16 @@ public:
         return -(double)(NumSamples-Index) / (double)NumSamples;
     }
 
-    template<typename T>
-    static void Compute(size_t NumSamples, T *pRealIn, T *pImagIn,
-                        T *pRealOut, T *pImagOut, bool bInverseTransform = false);
+    //template<typename T>
+    //static void Compute(size_t NumSamples, T *pRealIn, T *pImagIn,
+    //                    T *pRealOut, T *pImagOut, bool bInverseTransform = false);
 
-    template<typename T>
-    static void Norm(size_t NumSamples, T *pReal, T *pImag, T* pAmpl);
+    //template<typename T>
+    //static void Norm(size_t NumSamples, T *pReal, T *pImag, T* pAmpl);
 
-    template<typename T>
-    static double PeakFrequency(size_t NumSamples, const T *pAmpl, double samplingRate, size_t& index);
-};
+    //template<typename T>
+    //static double PeakFrequency(size_t NumSamples, const T *pAmpl, double samplingRate, size_t& index);
+//};
 
 
 /**
@@ -143,9 +145,12 @@ public:
  * @param pImagOut Imaginary coefficient output
  * @param bInverseTransform when true, compute Inverse FFT
  */
-template<typename T>
-void FFT::Compute(size_t NumSamples, T *pRealIn, T *pImagIn,
-                  T *pRealOut, T *pImagOut, bool bInverseTransform)
+//template<typename T>
+//void FFT::Compute(size_t NumSamples, T *pRealIn, T *pImagIn,
+//                  T *pRealOut, T *pImagOut, bool bInverseTransform)
+
+void FFT_Compute(size_t NumSamples, double* pRealIn, double* pImagIn,
+        double* pRealOut, double* pImagOut, bool bInverseTransform)
 {
     size_t NumBits;    /* Number of bits needed to store indices */
     size_t i, j, k, n;
@@ -177,7 +182,7 @@ void FFT::Compute(size_t NumSamples, T *pRealIn, T *pImagIn,
     {
         j = ReverseBits ( i, NumBits );
         pRealOut[j] = pRealIn[i];
-        pImagOut[j] = static_cast<T>((pImagIn == NULL) ? 0.0 : pImagIn[i]);
+        pImagOut[j] = /*static_cast<T>*/((pImagIn == NULL) ? 0.0 : pImagIn[i]);
     }
 
     /*
@@ -216,11 +221,11 @@ void FFT::Compute(size_t NumSamples, T *pRealIn, T *pImagIn,
                 tr = ar[0]*pRealOut[k] - ai[0]*pImagOut[k];
                 ti = ar[0]*pImagOut[k] + ai[0]*pRealOut[k];
 
-                pRealOut[k] = static_cast<T>( pRealOut[j] - tr);
-                pImagOut[k] = static_cast<T>( pImagOut[j] - ti);
+                pRealOut[k] = /*static_cast<T>*/( pRealOut[j] - tr);
+                pImagOut[k] = /*static_cast<T>*/( pImagOut[j] - ti);
 
-                pRealOut[j] += static_cast<T>(tr);
-                pImagOut[j] += static_cast<T>(ti);
+                pRealOut[j] += /*static_cast<T>*/(tr);
+                pImagOut[j] += /*static_cast<T>*/(ti);
             }
         }
 
@@ -232,7 +237,8 @@ void FFT::Compute(size_t NumSamples, T *pRealIn, T *pImagIn,
     */
     if ( bInverseTransform )
     {
-        T denom = static_cast<T>(NumSamples);
+        //T denom = static_cast<T>(NumSamples);
+        double denom = NumSamples;
 
         for ( i=0; i < NumSamples; i++ )
         {
@@ -249,8 +255,9 @@ void FFT::Compute(size_t NumSamples, T *pRealIn, T *pImagIn,
  * @param pImag Imaginary coefficient buffer
  * @param pAmpl Working buffer to hold amplitude Xps(m) = | X(m)^2 | = Xreal(m)^2  + Ximag(m)^2
  */
-template<typename T>
-void FFT::Norm(size_t NumSamples, T *pReal, T *pImag, T* pAmpl)
+//template<typename T>
+//void FFT::Norm(size_t NumSamples, T *pReal, T *pImag, T* pAmpl)
+void FFT_Norm(size_t NumSamples, double* pReal, double* pImag, double* pAmpl)
 {
     if ( !pReal || !pImag || !pAmpl )
     {
@@ -273,8 +280,9 @@ void FFT::Norm(size_t NumSamples, T *pReal, T *pImag, T* pAmpl)
  * @param index Frequency index
  * @return Peak frequency in Hz
  */
-template<typename T>
-double FFT::PeakFrequency(size_t NumSamples, const T *pAmpl, double samplingRate, size_t& index)
+//template<typename T>
+//double FFT::PeakFrequency(size_t NumSamples, const T *pAmpl, double samplingRate, size_t& index)
+double FFT_PeakFrequency(size_t NumSamples, const double* pAmpl, double samplingRate, size_t* index)
 {
     const size_t N = NumSamples>>1;   // number of positive frequencies. (numSamples/2)
 
@@ -286,7 +294,7 @@ double FFT::PeakFrequency(size_t NumSamples, const T *pAmpl, double samplingRate
 
     double maxAmpl = -1.0;
     double peakFreq = -1.0;
-    index = 0;
+    *index = 0;
 
     for ( size_t i = 0; i < N; i++ )
     {
@@ -294,16 +302,17 @@ double FFT::PeakFrequency(size_t NumSamples, const T *pAmpl, double samplingRate
         {
             maxAmpl = pAmpl[i];
             index = i;
-            peakFreq = static_cast<double>(i);
+            /*peakFreq = static_cast<double>(i);*/
+            peakFreq = i;
         }
     }
 
-    return samplingRate * peakFreq / static_cast<double>(NumSamples);
+    return samplingRate * peakFreq / /*static_cast<double>*/(NumSamples);
 }
 
 
 /* End of namespace */
-} }
+//} }
 
 #endif //FFT_HPP
 
