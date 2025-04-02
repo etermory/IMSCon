@@ -83,15 +83,14 @@ void _get_levels(double* real_in, double* ampl, int len)
     FFT_Norm(len / 2, real_out, im_out, ampl);
 }
 
-void print_sound_level(void* pcm_buffer, int len)
+void print_sound_level(int16_t* pcm_buffer, int len)
 {
     if (len == 0) return;
 
     double real_in[512], ampl[512];
-    const short* data = (const short*)pcm_buffer;
     for (int i = 0, j = 0; i < len; ++i, j++)
     {
-        real_in[i] = (double)(data[j]);
+        real_in[i] = (double)(pcm_buffer[j]);
     }
 
     _get_levels(real_in, ampl, len);
@@ -173,7 +172,7 @@ void callback(void* userdata, Uint8* stream, int len)
             print_title(music);
         }
 
-        uint8_t pcm_buffer[512 * 2]; // len == samples(512) * format(2) * channels(1)
+        int16_t pcm_buffer[512]; // len == samples(512) * format(2) * channels(1)
         int remain = get_sample(music, pcm_buffer, len / 2, MulDiv);
         SDL_MixAudio(stream, pcm_buffer, len - remain * 2, 128);
 

@@ -116,7 +116,7 @@ void _proc_lyrics(IMS_MUSIC* music)
     }
 }
 
-int get_sample(IMS_MUSIC* music, uint16_t* pcm_buffer, int buffer_len, muldiv_func muldiv)
+int get_sample(IMS_MUSIC* music, int16_t* pcm_buffer, int buffer_len, muldiv_func muldiv)
 {
     int sample_len = 0;
 
