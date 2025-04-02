@@ -4,7 +4,6 @@
 #include <Windows.h>    // MulDiv
 #include <SDL_mixer.h>
 
-#include "fft.h"
 #include "han.h"
 #include "play.h"
 
@@ -76,37 +75,23 @@ void print_lyrics(IMS_MUSIC* music)
     _tprintf(_T("^"));
 }
 
-void _get_levels(double* real_in, double* ampl, int len)
+void print_sound_level(double* ampl, double sec)
 {
-    double real_out[512], im_out[512];
-    FFT_Compute(len, real_in, NULL, real_out, im_out, false);
-    FFT_Norm(len / 2, real_out, im_out, ampl);
-}
-
-void print_sound_level(int16_t* pcm_buffer, int len)
-{
-    if (len == 0) return;
-
-    double real_in[512], ampl[512];
-    for (int i = 0, j = 0; i < len; ++i, j++)
-    {
-        real_in[i] = (double)(pcm_buffer[j]);
-    }
-
-    _get_levels(real_in, ampl, len);
+    if (sec <= 0) return;
 
 #define NUM_FREQUENCY 23
     const int METER_FREQUENCY[NUM_FREQUENCY] = { 30, 60, 100, 160, 240, 300, 350, 400, 440, 500, 600, 800, 1000, 1500, 2000, 2600, 3000, 4000, 6000, 8000, 10000, 14000, 16000 };
-    TCHAR LEVELS[8 + 1] = { _T(' '), _T('⢀'), _T('⣀'), _T('⣠'), _T('⣤'), _T('⣴'), _T('⣶'), _T('⣾'), _T('⣿') };
+#define MAX_LEVEL 8
+    TCHAR LEVELS[MAX_LEVEL + 1] = { _T(' '), _T('⢀'), _T('⣀'), _T('⣠'), _T('⣤'), _T('⣴'), _T('⣶'), _T('⣾'), _T('⣿') };
     const double max_ampl = 32767.0 * 32767.0;
 
     _tprintf(_T("\r"));
     for (int i = 0; i < NUM_FREQUENCY; ++i)
     {
-        int indice = METER_FREQUENCY[i] * len / 22050;
+        int indice = METER_FREQUENCY[i] * sec;
         int value = (int)(20 * log10(ampl[indice] / max_ampl));
         value = min(100, max(value, 0));
-        value = value / 100.0 * 8;
+        value = value / 100.0 * MAX_LEVEL;
         _tprintf(_T("%c "), LEVELS[value]);
     }
 }
@@ -162,7 +147,7 @@ void _play(PLAY_SRC playlist[], int list_cnt, SDL_AUDIO_USERDATA* userdata)
     ims_shutdown();
 }
 
-void callback(void* userdata, Uint8* stream, int len)
+void _callback(void* userdata, Uint8* stream, int len)
 {
     IMS_MUSIC* music = ((SDL_AUDIO_USERDATA*)userdata)->music;
 
@@ -172,14 +157,19 @@ void callback(void* userdata, Uint8* stream, int len)
             print_title(music);
         }
 
-        int16_t pcm_buffer[512]; // len == samples(512) * format(2) * channels(1)
-        int remain = get_sample(music, pcm_buffer, len / 2, MulDiv);
-        SDL_MixAudio(stream, pcm_buffer, len - remain * 2, 128);
+#define MAX_SAMPLES 512
+        int16_t pcm_buffer[MAX_SAMPLES];
+        int remain = get_sample(music, pcm_buffer, len / 2, MulDiv); // len == samples(512) * format(2) * channels(1)
+
+        SDL_MixAudio(stream, pcm_buffer, len - remain * 2, SDL_MIX_MAXVOLUME);
 
         if (music->iss != NULL) {
             print_lyrics(music);
-        } else {
-            print_sound_level(pcm_buffer, len / 2);
+        }
+        else {
+            double ampl[512];
+            get_fft_ampl(pcm_buffer, ampl, len / 2);
+            print_sound_level(ampl, len / 2 / 22050.0);
         }
     }
     else {
@@ -190,7 +180,7 @@ void callback(void* userdata, Uint8* stream, int len)
 
 SDL_AudioSpec* get_audio_spec()
 {
-    return _get_audio_spec(callback);
+    return _get_audio_spec(_callback);
 }
 
 void play(PLAY_SRC playlist[], int list_cnt, SDL_AudioSpec* audio_spec)

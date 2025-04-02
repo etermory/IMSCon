@@ -9,6 +9,8 @@
 #include "fmopl.h"
 #include "outchip.h"
 
+#include "fft.h"
+
 
 const int _freq = 22050;
 
@@ -150,6 +152,21 @@ int get_sample(IMS_MUSIC* music, int16_t* pcm_buffer, int buffer_len, muldiv_fun
     }
 
     return buffer_len; // remain
+}
+
+void get_fft_ampl(int16_t* pcm_buffer, double* ampl, int len)
+{
+    if (len == 0) return;
+
+#define MAX_SAMPLES 512
+    double real_in[MAX_SAMPLES], real_out[MAX_SAMPLES], im_out[MAX_SAMPLES];
+
+    for (int i = 0; i < len; ++i) {
+        real_in[i] = (double)(pcm_buffer[i]);
+    }
+
+    FFT_Compute(len, real_in, NULL, real_out, im_out, false);
+    FFT_Norm(len / 2, real_out, im_out, ampl);
 }
 
 void ims_init()
