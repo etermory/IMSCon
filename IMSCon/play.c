@@ -1,5 +1,6 @@
 ﻿#include <conio.h>
 #include <math.h>
+#include <stdlib.h>
 #include <tchar.h>
 
 #include <Windows.h>    // MulDiv
@@ -17,10 +18,10 @@ typedef struct {
 typedef void (*audio_callback)(void* userdata, Uint8* stream, int len);
 
 
-void mb_to_w(char mb[], wchar_t w[])
+void mb_to_wc(char mb[], wchar_t wc[])
 {
-    int len = MultiByteToWideChar(CP_ACP, 0, mb, strlen(mb), NULL, 0);
-    MultiByteToWideChar(CP_ACP, 0, mb, strlen(mb), w, len);
+    int len = mbstowcs(NULL, mb, 0);
+    mbstowcs(wc, mb, len + 1);
 }
 
 void print_title(IMS_MUSIC* music)
@@ -31,7 +32,7 @@ void print_title(IMS_MUSIC* music)
     printf("%s\n", title);
 #else
     TCHAR buf[50] = { 0, };
-    mb_to_w(title, buf);
+    mb_to_wc(title, buf);
     _tprintf(_T("%s\n"), buf);
 #endif
 }
@@ -55,7 +56,7 @@ void print_lyrics(IMS_MUSIC* music)
         printf("%s\n", music->lyrics[lyric_pos].text);
 #else
         TCHAR buf[100] = { 0, };
-        mb_to_w(music->lyrics[lyric_pos].text, buf);
+        mb_to_wc(music->lyrics[lyric_pos].text, buf);
         _tprintf(_T("%s\n"), buf);
 #endif
     }
