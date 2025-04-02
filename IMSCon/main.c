@@ -1,3 +1,8 @@
+#include <fcntl.h>
+#include <io.h>
+#include <locale.h>
+#include <tchar.h>
+
 #include <Windows.h>
 #include <SDL.h>
 #undef main
@@ -16,6 +21,11 @@ void hide_cursor()
 
 int main()
 {
+    _tsetlocale(LC_ALL, _T(""));
+    if (_setmode(_fileno(stdout), _O_WTEXT) == -1) {
+        return 1;
+    }
+
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
         return 1;
     }

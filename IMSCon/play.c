@@ -1,8 +1,10 @@
-#include <stdio.h>
+Ôªø#include <conio.h>
+#include <tchar.h>
 
 #include <Windows.h>    // MulDiv
 #include <SDL_mixer.h>
 
+#include "fft.h"
 #include "han.h"
 #include "play.h"
 
@@ -15,11 +17,23 @@ typedef struct {
 typedef void (*audio_callback)(void* userdata, Uint8* stream, int len);
 
 
+void mb_to_w(char mb[], wchar_t w[])
+{
+    int len = MultiByteToWideChar(CP_ACP, 0, mb, strlen(mb), NULL, NULL);
+    MultiByteToWideChar(CP_ACP, 0, mb, strlen(mb), w, len);
+}
+
 void print_title(IMS_MUSIC* music)
 {
     char title[30] = { 0, };
     han_conv(0, music->ims->header->tune_name, title);
+#ifndef UNICODE
     printf("%s\n", title);
+#else
+    TCHAR buf[50] = { 0, };
+    mb_to_w(title, buf);
+    _tprintf(_T("%s\n"), buf);
+#endif
 }
 
 void print_lyrics(IMS_MUSIC* music)
@@ -32,28 +46,70 @@ void print_lyrics(IMS_MUSIC* music)
     if (lyric_pos != last_lyric_pos) {
         last_lyric_pos = lyric_pos;
 
-        printf("\r");
+        _tprintf(_T("\r"));
         for (int i = 0; i < 78; ++i) {
-            printf(" ");
+            _tprintf(_T(" "));
         }
-        printf("\r");
+        _tprintf(_T("\r"));
+#ifndef UNICODE
         printf("%s\n", music->lyrics[lyric_pos].text);
+#else
+        TCHAR buf[100] = { 0, };
+        mb_to_w(music->lyrics[lyric_pos].text, buf);
+        _tprintf(_T("%s\n"), buf);
+#endif
     }
 
-    printf("\r");
+    _tprintf(_T("\r"));
     for (int i = 0; i < 78; ++i) {
-        printf(" ");
+        _tprintf(_T(" "));
     }
-    printf("\r");
+    _tprintf(_T("\r"));
 
     for (int i = 0; i < iss_rec->char_pos - 1; ++i) {
-        printf(" ");
+        _tprintf(_T(" "));
     }
-    printf("^");
+    _tprintf(_T("^"));
     for (int i = 0; i < iss_rec->char_cnt - 1; ++i) {
-        printf(" ");
+        _tprintf(_T(" "));
     }
-    printf("^");
+    _tprintf(_T("^"));
+}
+
+void _get_levels(double* real_in, double* ampl, int len)
+{
+    double real_out[512], im_out[512];
+    FFT_Compute(len, real_in, NULL, real_out, im_out, false);
+    FFT_Norm(len / 2, real_out, im_out, ampl);
+}
+
+void print_sound_level(void* pcm_buffer, int len)
+{
+    if (len == 0) return;
+
+    double real_in[512], ampl[512];
+    const short* data = (const short*)pcm_buffer;
+    for (int i = 0, j = 0; i < len; ++i, j++)
+    {
+        real_in[i] = (double)(data[j]);
+    }
+
+    _get_levels(real_in, ampl, len);
+
+#define NUM_FREQUENCY 23
+    const int METER_FREQUENCY[NUM_FREQUENCY] = { 30, 60, 100, 160, 240, 300, 350, 400, 440, 500, 600, 800, 1000, 1500, 2000, 2600, 3000, 4000, 6000, 8000, 10000, 14000, 16000 };
+    TCHAR LEVELS[8 + 1] = { _T(' '), _T('‚††'), _T('‚†§'), _T('‚†¥'), _T('‚†∂'), _T('‚†æ'), _T('‚†ø'), _T('‚£æ'), _T('‚£ø') };
+    const double max_ampl = 32767.0 * 32767.0;
+
+    _tprintf(_T("\r"));
+    for (int i = 0; i < NUM_FREQUENCY; ++i)
+    {
+        int indice = METER_FREQUENCY[i] * len / 22050;
+        int value = (int)(20 * log10(ampl[indice] / max_ampl));
+        value = min(100, max(value, 0));
+        value = value / 100.0 * 8;
+        _tprintf(_T("%c "), LEVELS[value]);
+    }
 }
 
 SDL_AudioSpec* _get_audio_spec(audio_callback callback)
@@ -96,10 +152,10 @@ void _play(PLAY_SRC playlist[], int list_cnt, SDL_AUDIO_USERDATA* userdata)
             ((SDL_AUDIO_USERDATA*)userdata)->music = music;
 
             SDL_PauseAudio(0);
-            printf("(¿Ωæ«¿Ã ≥°≥µ∞≈≥™, ¥Ÿ¿Ω∞Ó¿ª ");
-            system("PAUSE");
+            (void)_getch();
             SDL_PauseAudio(1);
 
+            while (SDL_GetAudioStatus() != SDL_AUDIO_PAUSED);
             free_music(music);
         }
     }
@@ -113,7 +169,7 @@ void callback(void* userdata, Uint8* stream, int len)
 
     if (!music->is_end || 0 < music->sample_remain_len) {
         if (music->tick == 0) {
-            printf(")\n");  // PAUSE πÆ±∏∞° √‚∑¬µ» »ƒ
+            _tprintf(_T("(ÏùåÏïÖÏù¥ ÎÅùÎÇ¨Í±∞ÎÇò Îã§Ïùå Í≥°ÏúºÎ°ú ÎÑòÏñ¥Í∞ÄÎ†§Î©¥ ÏïÑÎ¨¥ ÌÇ§ÎÇò ÎàÑÎ•¥Ïã≠ÏãúÏò§...)\n"));
             print_title(music);
         }
 
@@ -123,11 +179,13 @@ void callback(void* userdata, Uint8* stream, int len)
 
         if (music->iss != NULL) {
             print_lyrics(music);
+        } else {
+            print_sound_level(pcm_buffer, len / 2);
         }
     }
     else {
         SDL_PauseAudio(1);
-        printf("Done!");
+        _tprintf(_T("ÎÅù!"));
     }
 }
 
