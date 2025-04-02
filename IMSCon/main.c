@@ -25,6 +25,7 @@ int main()
     if (_setmode(_fileno(stdout), _O_WTEXT) == -1) {
         return 1;
     }
+    hide_cursor();
 
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
         return 1;
@@ -38,8 +39,6 @@ int main()
     if (SDL_OpenAudio(audio_spec, NULL) < 0) {
         return 1;
     }
-
-    hide_cursor();
 
     PLAY_SRC playlist[] = {
         {"MNT-015B.IMS", "MNT-015B.ISS", "MNT-015B.BNK"},

@@ -97,7 +97,7 @@ void print_sound_level(int16_t* pcm_buffer, int len)
 
 #define NUM_FREQUENCY 23
     const int METER_FREQUENCY[NUM_FREQUENCY] = { 30, 60, 100, 160, 240, 300, 350, 400, 440, 500, 600, 800, 1000, 1500, 2000, 2600, 3000, 4000, 6000, 8000, 10000, 14000, 16000 };
-    TCHAR LEVELS[8 + 1] = { _T(' '), _T('⠠'), _T('⠤'), _T('⠴'), _T('⠶'), _T('⠾'), _T('⠿'), _T('⣾'), _T('⣿') };
+    TCHAR LEVELS[8 + 1] = { _T(' '), _T('⢀'), _T('⣀'), _T('⣠'), _T('⣤'), _T('⣴'), _T('⣶'), _T('⣾'), _T('⣿') };
     const double max_ampl = 32767.0 * 32767.0;
 
     _tprintf(_T("\r"));
@@ -168,7 +168,7 @@ void callback(void* userdata, Uint8* stream, int len)
 
     if (!music->is_end || 0 < music->sample_remain_len) {
         if (music->tick == 0) {
-            _tprintf(_T("(음악이 끝났거나 다음 곡으로 넘어가려면 아무 키나 누르십시오...)\n"));
+            _tprintf(_T("\n(음악이 끝났거나 다음 곡으로 넘어가려면 아무 키나 누르십시오...)\n"));
             print_title(music);
         }
 
