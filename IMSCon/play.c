@@ -1,7 +1,6 @@
 ﻿#include <conio.h>
 #include <math.h>
 #include <stdlib.h>
-#include <tchar.h>
 
 #include <Windows.h>    // MulDiv
 #include <SDL_mixer.h>
@@ -28,13 +27,10 @@ void print_title(IMS_MUSIC* music)
 {
     char title[30] = { 0, };
     han_conv(0, music->ims->header->tune_name, title);
-#ifndef UNICODE
-    printf("%s\n", title);
-#else
-    TCHAR buf[50] = { 0, };
+
+    wchar_t buf[50] = { 0, };
     mb_to_wc(title, buf);
-    _tprintf(_T("%s\n"), buf);
-#endif
+    wprintf(L"%s\n", buf);
 }
 
 void print_lyrics(IMS_MUSIC* music)
@@ -47,34 +43,31 @@ void print_lyrics(IMS_MUSIC* music)
     if (lyric_pos != last_lyric_pos) {
         last_lyric_pos = lyric_pos;
 
-        _tprintf(_T("\r"));
+        wprintf(L"\r");
         for (int i = 0; i < 78; ++i) {
-            _tprintf(_T(" "));
+            wprintf(L" ");
         }
-        _tprintf(_T("\r"));
-#ifndef UNICODE
-        printf("%s\n", music->lyrics[lyric_pos].text);
-#else
-        TCHAR buf[100] = { 0, };
+        wprintf(L"\r");
+
+        wchar_t buf[100] = { 0, };
         mb_to_wc(music->lyrics[lyric_pos].text, buf);
-        _tprintf(_T("%s\n"), buf);
-#endif
+        wprintf(L"%s\n", buf);
     }
 
-    _tprintf(_T("\r"));
+    wprintf(L"\r");
     for (int i = 0; i < 78; ++i) {
-        _tprintf(_T(" "));
+        wprintf(L" ");
     }
-    _tprintf(_T("\r"));
+    wprintf(L"\r");
 
     for (int i = 0; i < iss_rec->char_pos - 1; ++i) {
-        _tprintf(_T(" "));
+        wprintf(L" ");
     }
-    _tprintf(_T("^"));
+    wprintf(L"^");
     for (int i = 0; i < iss_rec->char_cnt - 1; ++i) {
-        _tprintf(_T(" "));
+        wprintf(L" ");
     }
-    _tprintf(_T("^"));
+    wprintf(L"^");
 }
 
 void print_sound_level(double* ampl, double sec)
@@ -84,17 +77,17 @@ void print_sound_level(double* ampl, double sec)
 #define NUM_FREQUENCY 23
     const int METER_FREQUENCY[NUM_FREQUENCY] = { 30, 60, 100, 160, 240, 300, 350, 400, 440, 500, 600, 800, 1000, 1500, 2000, 2600, 3000, 4000, 6000, 8000, 10000, 14000, 16000 };
 #define MAX_LEVEL 8
-    TCHAR LEVELS[MAX_LEVEL + 1] = { _T(' '), _T('⢀'), _T('⣀'), _T('⣠'), _T('⣤'), _T('⣴'), _T('⣶'), _T('⣾'), _T('⣿') };
+    wchar_t LEVELS[MAX_LEVEL + 1] = { L' ', L'⢀', L'⣀', L'⣠', L'⣤', L'⣴', L'⣶', L'⣾', L'⣿' };
     const double max_ampl = 32767.0 * 32767.0;
 
-    _tprintf(_T("\r"));
+    wprintf(L"\r");
     for (int i = 0; i < NUM_FREQUENCY; ++i)
     {
         int indice = METER_FREQUENCY[i] * sec;
         int value = (int)(20 * log10(ampl[indice] / max_ampl));
         value = min(100, max(value, 0));
         value = value / 100.0 * MAX_LEVEL;
-        _tprintf(_T("%c "), LEVELS[value]);
+        wprintf(L"%c ", LEVELS[value]);
     }
 }
 
@@ -155,7 +148,7 @@ void _callback(void* userdata, Uint8* stream, int len)
 
     if (!music->is_end || 0 < music->sample_remain_len) {
         if (music->tick == 0) {
-            _tprintf(_T("\n(음악이 끝났거나 다음 곡으로 넘어가려면 아무 키나 누르십시오...)\n"));
+            wprintf(L"\n(음악이 끝났거나 다음 곡으로 넘어가려면 아무 키나 누르십시오...)\n");
             print_title(music);
         }
 
@@ -176,7 +169,7 @@ void _callback(void* userdata, Uint8* stream, int len)
     }
     else {
         SDL_PauseAudio(1);
-        _tprintf(_T("끝!"));
+        wprintf(L"끝!");
     }
 }
 

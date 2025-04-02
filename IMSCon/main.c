@@ -1,7 +1,6 @@
 #include <fcntl.h>
 #include <io.h>
 #include <locale.h>
-#include <tchar.h>
 
 #include <Windows.h>
 #include <SDL.h>
@@ -21,7 +20,7 @@ void hide_cursor()
 
 int main()
 {
-    _tsetlocale(LC_ALL, _T(""));
+    _wsetlocale(LC_ALL, L"");
     if (_setmode(_fileno(stdout), _O_WTEXT) == -1) {
         return 1;
     }
