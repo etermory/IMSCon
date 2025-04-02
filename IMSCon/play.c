@@ -1,4 +1,5 @@
 ﻿#include <conio.h>
+#include <math.h>
 #include <tchar.h>
 
 #include <Windows.h>    // MulDiv
@@ -18,7 +19,7 @@ typedef void (*audio_callback)(void* userdata, Uint8* stream, int len);
 
 void mb_to_w(char mb[], wchar_t w[])
 {
-    int len = MultiByteToWideChar(CP_ACP, 0, mb, strlen(mb), NULL, NULL);
+    int len = MultiByteToWideChar(CP_ACP, 0, mb, strlen(mb), NULL, 0);
     MultiByteToWideChar(CP_ACP, 0, mb, strlen(mb), w, len);
 }
 
