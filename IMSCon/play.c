@@ -39,6 +39,10 @@ void print_title(IMS_MUSIC* music)
 void print_lyrics(IMS_MUSIC* music)
 {
     static int last_lyric_pos = 0;
+    if (music == NULL) {
+        last_lyric_pos = 0;
+        return;
+    }
 
     ISS_RECORD* iss_rec = music->iss->records + music->last_iss_rec_pos;
 
@@ -240,6 +244,7 @@ void _callback(void* userdata, Uint8* stream, int len)
         if (music->tick == 0) {
             wprintf(L"\n(음악이 끝났거나 다음 곡으로 넘어가려면 아무 키나 누르십시오...)\n");
             print_title(music);
+            print_lyrics(NULL);
         }
 
 #define MAX_SAMPLES 512
