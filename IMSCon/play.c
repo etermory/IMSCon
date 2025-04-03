@@ -148,6 +148,8 @@ PLAY_SRC* get_play_src(char* ims_filename)
     strcpy(strpbrk(filename, ".") + 1, "BNK");
     if (_access(filename, 0) == 0) {
         strcpy(src->bnk_path, filename);
+    } else {
+        strcpy(src->bnk_path, "STANDARD.BNK");
     }
 
     return src;
