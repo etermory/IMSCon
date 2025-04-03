@@ -1,6 +1,9 @@
-﻿#include <conio.h>
-#include <math.h>
+﻿#include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
+
+#include <conio.h>
+#include <io.h>
 
 #include <Windows.h>    // MulDiv
 #include <SDL_mixer.h>
@@ -121,12 +124,97 @@ void free_audio_spec(SDL_AudioSpec* audio_spec)
     free(audio_spec);
 }
 
-void _play(PLAY_SRC playlist[], int list_cnt, SDL_AUDIO_USERDATA* userdata)
+PLAY_SRC* get_play_src(char* ims_filename)
+{
+    char filename[13];
+    strcpy(filename, ims_filename);
+
+    PLAY_SRC* src = malloc(sizeof(PLAY_SRC));
+    if (src == NULL) {
+        return NULL;
+    }
+
+    strcpy(src->ims_path, filename);
+
+    strcpy(strpbrk(filename, ".") + 1, "ISS");
+    if (_access(filename, 0) == 0) {
+        strcpy(src->iss_path, filename);
+    }
+
+    strcpy(strpbrk(filename, ".") + 1, "BNK");
+    if (_access(filename, 0) == 0) {
+        strcpy(src->bnk_path, filename);
+    }
+
+    return src;
+}
+
+LIST get_playlist(char* filename)
+{
+    LIST playlist = { NULL };
+
+    if (_access(filename, 0) != 0) {
+        return playlist;
+    }
+
+    FILE* fp = fopen(filename, "r");
+    if (fp == NULL) {
+        return playlist;
+    }
+
+    NODE* prev = NULL;
+    char ims_filename[14];
+    while (fgets(ims_filename, 14, fp)) {
+        *strpbrk(ims_filename, "\n") = 0;
+
+        PLAY_SRC* src = get_play_src(ims_filename);
+        if (src == NULL) {
+            return playlist;
+        }
+
+        NODE* node = malloc(sizeof(NODE));
+        if (node == NULL) {
+            free(src);
+            return playlist;
+        }
+
+        node->data = src;
+        node->next = NULL;
+
+        if (playlist.head == NULL) {
+            playlist.head = node;
+        }
+
+        if (prev == NULL) {
+            prev = playlist.head;
+        }
+        else {
+            prev = prev->next = node;
+        }
+    }
+    fclose(fp);
+
+    return playlist;
+}
+
+void free_playlist(LIST playlist)
+{
+    NODE* cur = playlist.head;
+    while (cur) {
+        free(cur->data);
+        cur = cur->next;
+    }
+}
+
+void _play(NODE* head, SDL_AUDIO_USERDATA* userdata)
 {
     ims_init();
 
-    for (int i = 0; i < list_cnt; ++i) {
-        IMS_MUSIC* music = prepare_music(playlist[i].ims_path, playlist[i].iss_path, playlist[i].bnk_path);
+    NODE* cur = head;
+    while (cur != NULL) {
+        PLAY_SRC* src = (PLAY_SRC*)cur->data;
+
+        IMS_MUSIC* music = prepare_music(src->ims_path, src->iss_path, src->bnk_path);
         if (music != NULL) {
             ((SDL_AUDIO_USERDATA*)userdata)->music = music;
 
@@ -137,6 +225,8 @@ void _play(PLAY_SRC playlist[], int list_cnt, SDL_AUDIO_USERDATA* userdata)
             while (SDL_GetAudioStatus() != SDL_AUDIO_PAUSED);
             free_music(music);
         }
+
+        cur = cur->next;
     }
 
     ims_shutdown();
@@ -178,7 +268,7 @@ SDL_AudioSpec* get_audio_spec()
     return _get_audio_spec(_callback);
 }
 
-void play(PLAY_SRC playlist[], int list_cnt, SDL_AudioSpec* audio_spec)
+void play(LIST playlist, SDL_AudioSpec* audio_spec)
 {
-    _play(playlist, list_cnt, audio_spec->userdata);
+    _play(playlist.head, audio_spec->userdata);
 }

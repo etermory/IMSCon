@@ -58,7 +58,7 @@ typedef int (*muldiv_func)(int number, int numerator, int denominator);
 
 void ims_init();
 void ims_shutdown();
-IMS_MUSIC* prepare_music(char* ims_path, char* iss_path, char* bnk_path);
+IMS_MUSIC* prepare_music(char ims_path[], char iss_path[], char bnk_path[]);
 void free_music(IMS_MUSIC* music);
 int get_sample(IMS_MUSIC* music, int16_t* pcm_buffer, int buffer_len, muldiv_func muldiv);
 void get_fft_ampl(int16_t* pcm_buffer, double* ampl, int len);

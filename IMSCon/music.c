@@ -220,7 +220,7 @@ LYRIC* _convert_lyrics(ISS* iss)
     return lyrics;
 }
 
-IMS_MUSIC* _load_music(char* ims_path, char* iss_path, char* bnk_path)
+IMS_MUSIC* _load_music(char ims_path[], char iss_path[], char bnk_path[])
 {
     IMS* ims = load_ims(ims_path);
     if (ims == NULL) {
@@ -229,7 +229,7 @@ IMS_MUSIC* _load_music(char* ims_path, char* iss_path, char* bnk_path)
 
     ISS* iss = NULL;
     LYRIC* lyrics = NULL;
-    if (iss_path != NULL) {
+    if (strlen(iss_path) != 0) {
         iss = load_iss(iss_path);
         if (iss != NULL) {
             lyrics = _convert_lyrics(iss);
@@ -300,7 +300,7 @@ void free_music(IMS_MUSIC* music)
     free(music);
 }
 
-IMS_MUSIC* prepare_music(char* ims_path, char* iss_path, char* bnk_path)
+IMS_MUSIC* prepare_music(char ims_path[], char iss_path[], char bnk_path[])
 {
     IMS_MUSIC* music = _load_music(ims_path, iss_path, bnk_path);
     if (music == NULL) {
