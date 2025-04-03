@@ -18,19 +18,7 @@
     <ClCompile Include="main.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="adlib.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="han.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="fmopl.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="outchip.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="setfreq.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ims.c">
@@ -51,21 +39,21 @@
     <ClCompile Include="play.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="LibOPL\adlib.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOPL\fmopl.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOPL\outchip.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LibOPL\setfreq.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="adlib.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="han.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="fmopl.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="outchip.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="setfreq.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ims.h">

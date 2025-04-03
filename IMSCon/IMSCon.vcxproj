@@ -155,33 +155,29 @@ copy /Y "$(ProjectDir)SDL_mixer-1.2.12\lib\$(PlatformShortName)\SDL_mixer.dll" "
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="adlib.c" />
     <ClCompile Include="bnk.c" />
     <ClCompile Include="han.c" />
-    <ClCompile Include="fmopl.c" />
     <ClCompile Include="ims.c" />
     <ClCompile Include="iss.c" />
+    <ClCompile Include="LibOPL\adlib.c" />
+    <ClCompile Include="LibOPL\fmopl.c" />
+    <ClCompile Include="LibOPL\outchip.c" />
+    <ClCompile Include="LibOPL\setfreq.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="music.c" />
-    <ClCompile Include="outchip.c" />
     <ClCompile Include="play.c" />
     <ClCompile Include="raw.c" />
-    <ClCompile Include="setfreq.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="adlib.h" />
     <ClInclude Include="bnk.h" />
     <ClInclude Include="fft.h" />
     <ClInclude Include="han.h" />
-    <ClInclude Include="fmopl.h" />
     <ClInclude Include="ims.h" />
     <ClInclude Include="iss.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="music.h" />
-    <ClInclude Include="outchip.h" />
     <ClInclude Include="play.h" />
     <ClInclude Include="raw.h" />
-    <ClInclude Include="setfreq.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

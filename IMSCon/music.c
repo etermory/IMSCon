@@ -5,7 +5,7 @@
 #include "han.h"
 #include "music.h"
 
-#include "outchip.h"
+#include "libopl/libopl.h"
 
 #include "fft.h"
 
