@@ -44,3 +44,23 @@ void SndOutput(int addr, int dataVal)
 	YM3812Write(ym3812p, 0, addr);
 	YM3812Write(ym3812p, 1, dataVal);
 }
+
+void SndInit(int rate)
+{
+    ym3812p = YM3812Init(3579545L, rate);
+}
+
+void SndUpdateOne(short* buffer, int length)
+{
+    YM3812UpdateOne(ym3812p, buffer, length);
+}
+
+void SndShutdown()
+{
+    YM3812Shutdown(ym3812p);
+}
+
+void SndReset()
+{
+    YM3812ResetChip(ym3812p);
+}

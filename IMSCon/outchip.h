@@ -5,9 +5,12 @@
 extern "C" {
 #endif
 
-extern void *ym3812p;
-
 void SndOutput(int addr, int dataVal);
+
+void SndInit(int rate);
+void SndUpdateOne(short *buffer, int length);
+void SndShutdown();
+void SndReset();
 
 #ifdef __cplusplus
 }

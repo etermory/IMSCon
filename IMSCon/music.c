@@ -5,8 +5,6 @@
 #include "han.h"
 #include "music.h"
 
-#include "adlib.h"
-#include "fmopl.h"
 #include "outchip.h"
 
 #include "fft.h"
@@ -145,7 +143,7 @@ int get_sample(IMS_MUSIC* music, int16_t* pcm_buffer, int buffer_len, muldiv_fun
             sample_len = buffer_len;
         }
 
-        YM3812UpdateOne(ym3812p, pcm_buffer, sample_len);
+        SndUpdateOne(pcm_buffer, sample_len);
 
         pcm_buffer = pcm_buffer + sample_len;
         buffer_len = buffer_len - sample_len;
@@ -171,13 +169,13 @@ void get_fft_ampl(int16_t* pcm_buffer, double* ampl, int len)
 
 void ims_init()
 {
-    ym3812p = YM3812Init(3579545L, _freq);
+    SndInit(_freq);
     SoundWarmInit();
 }
 
 void ims_shutdown()
 {
-    YM3812Shutdown(ym3812p);
+    SndShutdown();
 }
 
 void _copy_timbre_params(int* timbres, uint8_t* bnk_inst_record)
@@ -307,7 +305,7 @@ IMS_MUSIC* prepare_music(char ims_path[], char iss_path[], char bnk_path[])
         return NULL;
     }
 
-    YM3812ResetChip(ym3812p);
+    SndReset();
     SndOutput(1, 0x20);
     SetMode(music->ims->header->sound_mode);
     int volumes = 9 + music->ims->header->sound_mode * 2;
