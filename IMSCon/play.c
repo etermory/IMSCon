@@ -33,7 +33,7 @@ void print_title(IMS_MUSIC* music)
 
     wchar_t buf[50] = { 0, };
     mb_to_wc(title, buf);
-    wprintf(L"%s\n", buf);
+    wprintf(L"TITLE: %s\n", buf);
 }
 
 void print_lyrics(IMS_MUSIC* music)
@@ -216,9 +216,12 @@ void _play(NODE* head, SDL_AUDIO_USERDATA* userdata)
 {
     ims_init();
 
+    wprintf(L"(음악이 끝났거나 다음 곡으로 넘어가려면 아무 키나 누르십시오...)\n");
+
     NODE* cur = head;
     while (cur != NULL) {
         PLAY_SRC* src = (PLAY_SRC*)cur->data;
+        wprintf(L"FILE: %S\n", src->ims_path);
 
         IMS_MUSIC* music = prepare_music(src->ims_path, src->iss_path, src->bnk_path);
         if (music != NULL) {
@@ -232,6 +235,8 @@ void _play(NODE* head, SDL_AUDIO_USERDATA* userdata)
             free_music(music);
         }
 
+        wprintf(L"\n");
+
         cur = cur->next;
     }
 
@@ -244,7 +249,6 @@ void _callback(void* userdata, Uint8* stream, int len)
 
     if (!music->is_end || 0 < music->sample_remain_len) {
         if (music->tick == 0) {
-            wprintf(L"\n(음악이 끝났거나 다음 곡으로 넘어가려면 아무 키나 누르십시오...)\n");
             print_title(music);
             print_lyrics(NULL);
         }
@@ -266,7 +270,7 @@ void _callback(void* userdata, Uint8* stream, int len)
     }
     else {
         SDL_PauseAudio(1);
-        wprintf(L"끝!");
+        wprintf(L"끝!\n");
     }
 }
 
