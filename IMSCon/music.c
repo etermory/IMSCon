@@ -2,15 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libopl.h"
+
 #include "han.h"
 #include "music.h"
-
-#include "libopl/libopl.h"
-
-#include "fft.h"
-
-
-const int _freq = 22050;
 
 
 int _proc_music(IMS_MUSIC* music)
@@ -116,7 +111,7 @@ void _proc_lyrics(IMS_MUSIC* music)
     }
 }
 
-int get_sample(IMS_MUSIC* music, int16_t* pcm_buffer, int buffer_len, muldiv_func muldiv)
+int get_sample(IMS_MUSIC* music, int freq, int16_t* pcm_buffer, int buffer_len, muldiv_func muldiv)
 {
     int sample_len = 0;
 
@@ -128,7 +123,7 @@ int get_sample(IMS_MUSIC* music, int16_t* pcm_buffer, int buffer_len, muldiv_fun
         else if (!music->is_end) {
             int tempo = music->tempo;
             int delay = _proc_music(music);
-            sample_len = muldiv(_freq * 60, delay, tempo * music->ims->header->tick_beat);
+            sample_len = muldiv(freq * 60, delay, tempo * music->ims->header->tick_beat);
             music->tick += delay;
 
             _proc_lyrics(music);
@@ -152,24 +147,9 @@ int get_sample(IMS_MUSIC* music, int16_t* pcm_buffer, int buffer_len, muldiv_fun
     return buffer_len; // remain
 }
 
-void get_fft_ampl(int16_t* pcm_buffer, double* ampl, int len)
+void ims_init(int freq)
 {
-    if (len == 0) return;
-
-#define MAX_SAMPLES 512
-    double real_in[MAX_SAMPLES], real_out[MAX_SAMPLES], im_out[MAX_SAMPLES];
-
-    for (int i = 0; i < len; ++i) {
-        real_in[i] = (double)(pcm_buffer[i]);
-    }
-
-    FFT_Compute(len, real_in, NULL, real_out, im_out, false);
-    FFT_Norm(len / 2, real_out, im_out, ampl);
-}
-
-void ims_init()
-{
-    SndInit(_freq);
+    SndInit(freq);
     SoundWarmInit();
 }
 

@@ -8,8 +8,16 @@
 #include <Windows.h>    // MulDiv
 #include <SDL_mixer.h>
 
+#include "fft.h"
+
 #include "han.h"
 #include "play.h"
+
+
+#define AUDIO_FREQ          22050
+#define AUDIO_CHANNELS      1
+#define SAMPLE_UNIT_SIZE    2       // audio_spec.format = AUDIO_S16SYS
+#define AUDIO_SAMPLES       512
 
 
 typedef struct {
@@ -112,10 +120,10 @@ SDL_AudioSpec* _get_audio_spec(audio_callback callback)
     }
 
     memset(audio_spec, 0, sizeof(SDL_AudioSpec));
-    audio_spec->freq = 22050;
+    audio_spec->freq = AUDIO_FREQ;
     audio_spec->format = AUDIO_S16SYS;
-    audio_spec->channels = 1;
-    audio_spec->samples = 512;
+    audio_spec->channels = AUDIO_CHANNELS;
+    audio_spec->samples = AUDIO_SAMPLES;
     audio_spec->callback = callback;
     audio_spec->userdata = userdata;
 
@@ -212,9 +220,23 @@ void free_playlist(LIST playlist)
     }
 }
 
+void get_fft_ampl(int16_t* pcm_buffer, double* ampl, int len)
+{
+    if (len == 0) return;
+
+    double real_in[AUDIO_SAMPLES], real_out[AUDIO_SAMPLES], im_out[AUDIO_SAMPLES];
+
+    for (int i = 0; i < len; ++i) {
+        real_in[i] = (double)(pcm_buffer[i]);
+    }
+
+    FFT_Compute(len, real_in, NULL, real_out, im_out, false);
+    FFT_Norm(len / 2, real_out, im_out, ampl);
+}
+
 void _play(NODE* head, SDL_AUDIO_USERDATA* userdata)
 {
-    ims_init();
+    ims_init(AUDIO_FREQ);
 
     wprintf(L"(음악이 끝났거나 다음 곡으로 넘어가려면 아무 키나 누르십시오...)\n");
 
@@ -253,19 +275,20 @@ void _callback(void* userdata, Uint8* stream, int len)
             print_lyrics(NULL);
         }
 
-#define MAX_SAMPLES 512
-        int16_t pcm_buffer[MAX_SAMPLES];
-        int remain = get_sample(music, pcm_buffer, len / 2, MulDiv); // len == samples(512) * format(2) * channels(1)
+        int16_t pcm_buffer[AUDIO_SAMPLES];
+        int sample_size = len / SAMPLE_UNIT_SIZE; // len == samples(512) * format(2) * channels(1)
 
-        SDL_MixAudio(stream, pcm_buffer, len - remain * 2, SDL_MIX_MAXVOLUME);
+        int remain = get_sample(music, AUDIO_FREQ, pcm_buffer, sample_size, MulDiv) * SAMPLE_UNIT_SIZE;
+
+        SDL_MixAudio(stream, pcm_buffer, len - remain, SDL_MIX_MAXVOLUME);
 
         if (music->iss != NULL) {
             print_lyrics(music);
         }
         else {
-            double ampl[512];
-            get_fft_ampl(pcm_buffer, ampl, len / 2);
-            print_sound_level(ampl, len / 2 / 22050.0);
+            double ampl[AUDIO_SAMPLES];
+            get_fft_ampl(pcm_buffer, ampl, sample_size);
+            print_sound_level(ampl, sample_size / (double)AUDIO_FREQ);
         }
     }
     else {

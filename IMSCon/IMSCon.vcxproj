@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)SDL-1.2.15\include;$(ProjectDir)SDL_mixer-1.2.12\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SDL-1.2.15\include;$(ProjectDir)SDL_mixer-1.2.12\include;C:\Users\kornl\source\repos\IMSCon\IMSCon\LibOPL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -97,7 +97,7 @@ copy /Y "$(ProjectDir)SDL_mixer-1.2.12\lib\$(PlatformShortName)\SDL_mixer.dll" "
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)SDL-1.2.15\include;$(ProjectDir)SDL_mixer-1.2.12\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SDL-1.2.15\include;$(ProjectDir)SDL_mixer-1.2.12\include;C:\Users\kornl\source\repos\IMSCon\IMSCon\LibOPL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,7 +118,7 @@ copy /Y "$(ProjectDir)SDL_mixer-1.2.12\lib\$(PlatformShortName)\SDL_mixer.dll" "
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)SDL-1.2.15\include;$(ProjectDir)SDL_mixer-1.2.12\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SDL-1.2.15\include;$(ProjectDir)SDL_mixer-1.2.12\include;C:\Users\kornl\source\repos\IMSCon\IMSCon\LibOPL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,7 +139,7 @@ copy /Y "$(ProjectDir)SDL_mixer-1.2.12\lib\$(PlatformShortName)\SDL_mixer.dll" "
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)SDL-1.2.15\include;$(ProjectDir)SDL_mixer-1.2.12\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SDL-1.2.15\include;$(ProjectDir)SDL_mixer-1.2.12\include;C:\Users\kornl\source\repos\IMSCon\IMSCon\LibOPL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
