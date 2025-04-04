@@ -2,10 +2,13 @@
 
 #include <stdbool.h>
 
-#include "bnk.h"
-#include "ims.h"
-#include "iss.h"
+#include "ims_types.h"
+#include "iss_types.h"
+#include "bnk_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct {
     char text[64];
@@ -40,6 +43,7 @@ typedef struct {
 
 typedef struct {
     IMS* ims;
+    char title[30];
     ISS* iss;
     LYRIC* lyrics;
     BNK* bnk;
@@ -52,12 +56,6 @@ typedef struct {
     int sample_remain_len;
 } IMS_MUSIC;
 
-
-typedef int (*muldiv_func)(int number, int numerator, int denominator);
-
-
-void ims_init(int freq);
-void ims_shutdown();
-IMS_MUSIC* prepare_music(char ims_path[], char iss_path[], char bnk_path[]);
-void free_music(IMS_MUSIC* music);
-int get_sample(IMS_MUSIC* music, int freq, int16_t* pcm_buffer, int buffer_len, muldiv_func muldiv);
+#ifdef __cplusplus
+}
+#endif

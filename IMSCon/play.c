@@ -2,15 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <conio.h>
-#include <io.h>
+#include <conio.h>  // _getch
+#include <io.h>     // _access
 
-#include <Windows.h>    // MulDiv
 #include <SDL_mixer.h>
+
+#include "LibIMS.h"
 
 #include "fft.h"
 
-#include "han.h"
 #include "play.h"
 
 
@@ -36,11 +36,8 @@ void mb_to_wc(char mb[], wchar_t wc[])
 
 void print_title(IMS_MUSIC* music)
 {
-    char title[30] = { 0, };
-    han_conv(0, music->ims->header->tune_name, title);
-
     wchar_t buf[50] = { 0, };
-    mb_to_wc(title, buf);
+    mb_to_wc(music->title, buf);
     wprintf(L"TITLE: %s\n", buf);
 }
 
@@ -236,16 +233,17 @@ void get_fft_ampl(int16_t* pcm_buffer, double* ampl, int len)
 
 void _play(NODE* head, SDL_AUDIO_USERDATA* userdata)
 {
-    ims_init(AUDIO_FREQ);
+    IMS_Init(AUDIO_FREQ);
 
     wprintf(L"(음악이 끝났거나 다음 곡으로 넘어가려면 아무 키나 누르십시오...)\n");
 
     NODE* cur = head;
     while (cur != NULL) {
         PLAY_SRC* src = (PLAY_SRC*)cur->data;
-        wprintf(L"FILE: %S\n", src->ims_path);
+        wprintf(L"IMS: %S\n", src->ims_path);
+        wprintf(L"BNK: %S\n", src->bnk_path);
 
-        IMS_MUSIC* music = prepare_music(src->ims_path, src->iss_path, src->bnk_path);
+        IMS_MUSIC* music = IMS_PrepareMusic(src->ims_path, src->iss_path, src->bnk_path);
         if (music != NULL) {
             ((SDL_AUDIO_USERDATA*)userdata)->music = music;
 
@@ -254,7 +252,7 @@ void _play(NODE* head, SDL_AUDIO_USERDATA* userdata)
             SDL_PauseAudio(1);
 
             while (SDL_GetAudioStatus() != SDL_AUDIO_PAUSED);
-            free_music(music);
+            IMS_FreeMusic(music);
         }
 
         wprintf(L"\n");
@@ -262,7 +260,7 @@ void _play(NODE* head, SDL_AUDIO_USERDATA* userdata)
         cur = cur->next;
     }
 
-    ims_shutdown();
+    IMS_Shutdown();
 }
 
 void _callback(void* userdata, Uint8* stream, int len)
@@ -278,7 +276,7 @@ void _callback(void* userdata, Uint8* stream, int len)
         int16_t pcm_buffer[AUDIO_SAMPLES];
         int sample_size = len / SAMPLE_UNIT_SIZE; // len == samples(512) * format(2) * channels(1)
 
-        int remain = get_sample(music, AUDIO_FREQ, pcm_buffer, sample_size, MulDiv) * SAMPLE_UNIT_SIZE;
+        int remain = IMS_GetSample(music, AUDIO_FREQ, pcm_buffer, sample_size) * SAMPLE_UNIT_SIZE;
 
         SDL_MixAudio(stream, pcm_buffer, len - remain, SDL_MIX_MAXVOLUME);
 

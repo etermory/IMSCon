@@ -15,22 +15,46 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="play.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="play.h">
+    <ClInclude Include="framework.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="fft.h">
+    <ClInclude Include="LibOPL.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="list.h">
+    <ClInclude Include="adlib.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="fmopl.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="outchip.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="setfreq.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="LibOPL.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="adlib.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="fmopl.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="outchip.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="setfreq.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

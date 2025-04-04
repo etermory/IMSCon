@@ -2,6 +2,9 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #pragma pack(push, 1)
 #pragma pack(1)
@@ -41,6 +44,6 @@ typedef struct {
     ISS_LYRIC* lyrics;
 } ISS;
 
-
-ISS* load_iss(const char* filename);
-void free_iss(ISS* iss);
+#ifdef __cplusplus
+}
+#endif

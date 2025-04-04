@@ -2,13 +2,15 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct {
     uint8_t* data;
     size_t size;
 } RAW;
 
-
-RAW* alloc_raw(size_t size);
-void free_raw(RAW* raw);
-RAW* load_raw(const char* filename);
+#ifdef __cplusplus
+}
+#endif

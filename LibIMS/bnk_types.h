@@ -2,6 +2,9 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #pragma pack(push, 1)
 #pragma pack(1)
@@ -64,6 +67,6 @@ typedef struct {
     BNK_INST_RECORD* data;
 } BNK;
 
-
-BNK* load_bnk(const char* filename);
-void free_bnk(BNK* bnk);
+#ifdef __cplusplus
+}
+#endif

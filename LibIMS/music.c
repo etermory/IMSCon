@@ -2,9 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libopl.h"
+#include <Windows.h> // MulDiv
 
+#include "LibOPL.h"
+
+#include "bnk.h"
 #include "han.h"
+#include "ims.h"
+#include "iss.h"
 #include "music.h"
 
 
@@ -33,9 +38,9 @@ int _proc_music(IMS_MUSIC* music)
             note = music->ims->song_data[music->pos];
             volume = music->ims->song_data[music->pos + 1];
 
-            NoteOff(voice);
-            SetVoiceVolume(voice, volume);
-            NoteOn(voice, note);
+            OPL_NoteOff(voice);
+            OPL_SetVoiceVolume(voice, volume);
+            OPL_NoteOn(voice, note);
             music->pos += 2;
             break;
 
@@ -43,30 +48,30 @@ int _proc_music(IMS_MUSIC* music)
             note = music->ims->song_data[music->pos];
             volume = music->ims->song_data[music->pos + 1];
 
-            NoteOff(voice);
+            OPL_NoteOff(voice);
             if (volume) {
-                SetVoiceVolume(voice, volume);
-                NoteOn(voice, note);
+                OPL_SetVoiceVolume(voice, volume);
+                OPL_NoteOn(voice, note);
             }
             music->pos += 2;
             break;
 
         case 0xA0:	// vol
             volume = music->ims->song_data[music->pos];
-            SetVoiceVolume(voice, volume);
+            OPL_SetVoiceVolume(voice, volume);
             music->pos++;
             break;
 
         case 0xC0:	// ins
             inst_id = music->ims->song_data[music->pos];
             assert(0 <= inst_id && inst_id < music->bnk->header->num_instruments);
-            SetVoiceTimbre(voice, &music->timbres[inst_id].op_modulator);
+            OPL_SetVoiceTimbre(voice, &music->timbres[inst_id].op_modulator);
             music->pos++;
             break;
 
         case 0xE0:	// pit
             pitch_bend = *(uint16_t*)(music->ims->song_data + music->pos) / 2;
-            SetVoicePitch(voice, pitch_bend);
+            OPL_SetVoicePitch(voice, pitch_bend);
             music->pos += 2;
             break;
 
@@ -111,7 +116,7 @@ void _proc_lyrics(IMS_MUSIC* music)
     }
 }
 
-int get_sample(IMS_MUSIC* music, int freq, int16_t* pcm_buffer, int buffer_len, muldiv_func muldiv)
+int get_sample(IMS_MUSIC* music, int freq, int16_t* pcm_buffer, int buffer_len)
 {
     int sample_len = 0;
 
@@ -123,7 +128,7 @@ int get_sample(IMS_MUSIC* music, int freq, int16_t* pcm_buffer, int buffer_len, 
         else if (!music->is_end) {
             int tempo = music->tempo;
             int delay = _proc_music(music);
-            sample_len = muldiv(freq * 60, delay, tempo * music->ims->header->tick_beat);
+            sample_len = MulDiv(freq * 60, delay, tempo * music->ims->header->tick_beat);
             music->tick += delay;
 
             _proc_lyrics(music);
@@ -138,7 +143,7 @@ int get_sample(IMS_MUSIC* music, int freq, int16_t* pcm_buffer, int buffer_len, 
             sample_len = buffer_len;
         }
 
-        SndUpdateOne(pcm_buffer, sample_len);
+        OPL_SndUpdateOne(pcm_buffer, sample_len);
 
         pcm_buffer = pcm_buffer + sample_len;
         buffer_len = buffer_len - sample_len;
@@ -149,13 +154,13 @@ int get_sample(IMS_MUSIC* music, int freq, int16_t* pcm_buffer, int buffer_len, 
 
 void ims_init(int freq)
 {
-    SndInit(freq);
-    SoundWarmInit();
+    OPL_SndInit(freq);
+    //OPL_SoundWarmInit();
 }
 
 void ims_shutdown()
 {
-    SndShutdown();
+    OPL_SndShutdown();
 }
 
 void _copy_timbre_params(int* timbres, uint8_t* bnk_inst_record)
@@ -260,6 +265,7 @@ IMS_MUSIC* _load_music(char ims_path[], char iss_path[], char bnk_path[])
     music->bnk = bnk;
     music->timbres = timbres;
     music->tempo = ims->header->basic_tempo;
+    han_conv(0, music->ims->header->tune_name, music->title);
 
     return music;
 }
@@ -285,13 +291,14 @@ IMS_MUSIC* prepare_music(char ims_path[], char iss_path[], char bnk_path[])
         return NULL;
     }
 
-    SndReset();
-    SndOutput(1, 0x20);
-    SetMode(music->ims->header->sound_mode);
+    OPL_SndReset();
+    OPL_SoundWarmInit();
+    OPL_SndOutput(1, 0x20);
+    OPL_SetMode(music->ims->header->sound_mode);
     int volumes = 9 + music->ims->header->sound_mode * 2;
     for (int i = 0; i < volumes; ++i) {
-        NoteOff(i);
-        SetVoiceVolume(i, 0);
+        OPL_NoteOff(i);
+        OPL_SetVoiceVolume(i, 0);
     }
 
     return music;

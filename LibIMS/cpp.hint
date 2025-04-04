@@ -1,0 +1,2 @@
+#define LIBIMS_API __declspec(dllexport)
+#define LIBIMS_API __declspec(dllimport)

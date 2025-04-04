@@ -2,6 +2,9 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #pragma pack(push, 1)
 #pragma pack(1)
@@ -39,6 +42,6 @@ typedef struct {
     IMS_INSTRUMENT* instruments;
 } IMS;
 
-
-IMS* load_ims(const char* filename);
-void free_ims(IMS* ims);
+#ifdef __cplusplus
+}
+#endif

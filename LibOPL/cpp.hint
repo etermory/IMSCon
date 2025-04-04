@@ -1,0 +1,2 @@
+#define LIBOPL_API __declspec(dllexport)
+#define LIBOPL_API __declspec(dllimport)
